@@ -9,8 +9,7 @@ document.addEventListener("DOMContentLoaded", function () {
   const discountBanner = document.getElementById("discountBanner"); // Assuming this exists for checking discount status
 
   // --- Configuration ---
-  const FLUTTERWAVE_PUBLIC_KEY =
-    "FLWPUBK_TEST-048e59700701a459a784e8eca4658065-X";
+  const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-9f15aa6a4faa5443499383fe1d6ca2f8-X";
   const DISCOUNT_AMOUNT = 1500; // The discount value in NGN
 
   // Function to check if the discount is currently active
