@@ -94,26 +94,51 @@ document.addEventListener("DOMContentLoaded", function () {
         logo: "https://www.google.com/s2/favicons?domain=flutterwave.com", // You can put your own logo URL here
       },
       callback: function (response) {
-        // This function is called after a payment is completed or failed
         if (response.status === "successful") {
-          alert(
-            "Payment Successful! Your transaction reference is: " +
-              response.transaction_id
-          );
-          // TODO: Here, you would typically send the payment details to your backend
-          // to verify the payment and complete the registration process.
-          // Since no backend, we'll just display a success message for now.
-          registrationForm.reset(); // Clear the form
+          // Prepare the data to send to Google Apps Script
+          const postData = {
+            fullName: fullNameInput.value,
+            email: emailInput.value,
+            phone: phoneInput.value,
+            state: document.getElementById("state").value,
+            town: document.getElementById("town").value,
+            course: courseSelect.value,
+            amount: amount, // This was calculated earlier
+            tx_ref: tx_ref, // Already generated before payment
+            transaction_id: response.transaction_id, // Returned from Flutterwave
+          };
+
+          // Send data to Google Apps Script
+          fetch(
+            "https://script.google.com/macros/s/AKfycbzRiQUGIlKRDPrzGxqfG54LMfVnIRD2YVOFXvkKiINpd1SdA--1bv7tBmTQnj7RiWxF6Q/exec",
+            {
+              method: "POST",
+              body: JSON.stringify(postData),
+              headers: {
+                "Content-Type": "application/json",
+              },
+            }
+          )
+            .then((res) => res.json())
+            .then((data) => {
+              if (data.status === "success") {
+                alert("✅ Payment verified! You’re successfully registered.");
+                registrationForm.reset();
+              } else {
+                alert(
+                  "❌ Payment could not be verified. Please contact support."
+                );
+              }
+            })
+            .catch((err) => {
+              console.error(err);
+              alert("An error occurred while processing your registration.");
+            });
         } else {
           alert("Payment Failed! Please try again or contact support.");
-          // TODO: Handle failed payment (e.g., log error, prompt user to retry)
         }
-        console.log(response); // Log the full response for debugging
-      },
-      onclose: function () {
-        // User closed the modal without completing payment
-        console.log("Payment modal closed");
-        // You might want to display a message or log this event
+
+        console.log(response); // Log response for debugging
       },
     });
   });
