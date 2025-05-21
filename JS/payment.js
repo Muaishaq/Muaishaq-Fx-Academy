@@ -119,7 +119,12 @@ document.addEventListener("DOMContentLoaded", function () {
               },
             }
           )
-            .then((res) => res.json())
+            .then((res) => {
+              if (!res.ok) {
+                throw new Error(`Server returned status ${res.status}`);
+              }
+              return res.json();
+            })
             .then((data) => {
               if (data.status === "success") {
                 alert("✅ Payment verified! You’re successfully registered.");
@@ -131,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
               }
             })
             .catch((err) => {
-              console.error(err);
+              console.error("Fetch error:", err);
               alert("An error occurred while processing your registration.");
             });
         } else {
