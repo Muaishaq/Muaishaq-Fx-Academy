@@ -6,20 +6,22 @@ document.addEventListener("DOMContentLoaded", function () {
   const fullNameInput = document.getElementById("fullName");
   const emailInput = document.getElementById("email");
   const phoneInput = document.getElementById("phone");
-  const discountBanner = document.getElementById("discountBanner"); // Assuming this exists for checking discount status
+
+  // Get additional fields for meta data
+  const stateInput = document.getElementById("state");
+  const townInput = document.getElementById("town");
 
   // --- Configuration ---
   const FLUTTERWAVE_PUBLIC_KEY = "FLWPUBK-9f15aa6a4faa5443499383fe1d6ca2f8-X";
-  const DISCOUNT_AMOUNT = 1500; // The discount value in NGN
-
+  const DISCOUNT_AMOUNT = 1500;
+  const LOGIN_PORTAL_URL = "https://yourforexacademy.com/login.html";
   // Function to check if the discount is currently active
-  // This assumes your countdown logic correctly hides/shows the banner or a flag
-  // For simplicity, we'll check if the banner is visible (you might have a more robust JS way)
   function isDiscountActive() {
-    // You might have a global JS variable set by your countdown script
-    // For now, let's assume the banner's display style indicates activity
     const countdownTimerSpan = document.getElementById("countdownTimer");
-    return countdownTimerSpan && countdownTimerSpan.textContent !== "Expired!"; // Or however your countdown indicates expiry
+    // Ensure countdownTimerSpan exists and its text content is not "Expired!"
+    return (
+      countdownTimerSpan && countdownTimerSpan.textContent.trim() !== "Expired!"
+    );
   }
 
   // Function to get course price
@@ -41,109 +43,117 @@ document.addEventListener("DOMContentLoaded", function () {
   registrationForm.addEventListener("submit", function (event) {
     event.preventDefault(); // Prevent default form submission
 
-    // Basic client-side validation (HTML5 'required' helps a lot)
+    // Basic client-side validation to ensure form is valid before proceeding
     if (!registrationForm.checkValidity()) {
-      // If the browser's built-in validation fails, show a message
       alert("Please fill out all required fields correctly.");
       return;
     }
 
-    // Gather form data
+    // Gather form data ( needed for Flutterwave checkout parameters)
     const fullName = fullNameInput.value;
     const email = emailInput.value;
     const phone = phoneInput.value;
     const selectedCourse = courseSelect.value;
-    const state = document.getElementById("state").value;
-    const town = document.getElementById("town").value;
+    const state = stateInput.value; // Get value from the state input
+    const town = townInput.value; // Get value from the town input
 
-    // Calculate actual amount
     let amount = getCoursePrice(selectedCourse);
+
+    // Apply discount logic
     if (amount > 0 && isDiscountActive()) {
-      amount -= DISCOUNT_AMOUNT; // Apply discount
+      amount -= DISCOUNT_AMOUNT;
       if (amount < 0) amount = 0; // Ensure amount doesn't go negative
     }
 
+    // Prevent checkout if amount is zero or negative after calculation
     if (amount <= 0) {
-      alert("Please select a valid course or the calculated amount is zero.");
+      alert(
+        "Please select a valid course or the calculated amount is zero/negative."
+      );
       return;
     }
 
     // Generate a unique transaction reference
-    // In a real application, this should be generated on the server to ensure uniqueness
+    // Using Date.now() + random string ensures high uniqueness
     const tx_ref =
       "Muaishaq_" + Date.now() + Math.random().toString(36).substring(2, 15);
-
-    // Initiate Flutterwave Payment
 
     FlutterwaveCheckout({
       public_key: FLUTTERWAVE_PUBLIC_KEY,
       tx_ref: tx_ref,
       amount: amount,
-      currency: "NGN",
+      currency: "NGN", // Ensure this matches your expected currency
       payment_options: "card,mobilemoney,ussd",
       customer: {
         email: email,
         phone_number: phone,
         name: fullName,
       },
-
+      // IMPORTANT: Pass any custom data here so Apps Script can retrieve it
+      // from webhook/verification metadata (verificationResult.data.meta in Apps Script)
+      meta: {
+        // These keys should match what you expect in Apps Script's verificationResult.data.meta
+        state: state,
+        town: town,
+        course: selectedCourse,
+        // You can add other useful info here, e.g., the original amount, discount applied etc.
+        original_amount: getCoursePrice(selectedCourse), // Original amount before discount
+        discount_applied: isDiscountActive() ? DISCOUNT_AMOUNT : 0, // Indicate if discount was applied
+      },
       customizations: {
         title: "Muaishaq Forex Academy Registration",
         description: `Payment for ${selectedCourse} Course`,
-        logo: "https://www.google.com/s2/favicons?domain=flutterwave.com", // You can put your own logo URL here
+        // Make sure this logo URL is correct and publicly accessible
+        logo: "https://yourforexacademy.com/ASSETS/images/your-logo.png",
       },
       callback: function (response) {
+        // This callback is from Flutterwave, indicating their UI is done.
+        //now primarily rely on Flutterwave's webhook for backend logging/email.
         if (response.status === "successful") {
-          // Prepare the data to send to Google Apps Script
-          const postData = {
-            fullName: fullNameInput.value,
-            email: emailInput.value,
-            phone: phoneInput.value,
-            state: document.getElementById("state").value,
-            town: document.getElementById("town").value,
-            course: courseSelect.value,
-            amount: amount, // This was calculated earlier
-            tx_ref: tx_ref, // Already generated before payment
-            transaction_id: response.transaction_id, // Returned from Flutterwave
-          };
-
-          // Send data to Google Apps Script
-          fetch(
-            "https://script.google.com/macros/s/AKfycbzRiQUGIlKRDPrzGxqfG54LMfVnIRD2YVOFXvkKiINpd1SdA--1bv7tBmTQnj7RiWxF6Q/exec",
-            {
-              method: "POST",
-              body: JSON.stringify(postData),
-              headers: {
-                "Content-Type": "application/json",
-              },
-            }
-          )
-            .then((res) => {
-              if (!res.ok) {
-                throw new Error(`Server returned status ${res.status}`);
-              }
-              return res.json();
-            })
-            .then((data) => {
-              if (data.status === "success") {
-                alert("✅ Payment verified! You’re successfully registered.");
-                registrationForm.reset();
-              } else {
-                alert(
-                  "❌ Payment could not be verified. Please contact support."
-                );
-              }
-            })
-            .catch((err) => {
-              console.error("Fetch error:", err);
-              alert("An error occurred while processing your registration.");
-            });
+          alert(
+            "✅ Payment successful! You will receive an email shortly. Redirecting to your login portal..."
+          );
+          registrationForm.reset(); // Clear the form after successful initiation
+          // Redirect the user immediately. The Apps Script (via webhook) will handle logging and email.
+          window.location.href = LOGIN_PORTAL_URL; // Redirect to your login page/dashboard
         } else {
-          alert("Payment Failed! Please try again or contact support.");
+          // Payment was not successful or failed.
+          alert("❌ Payment Failed! Please try again or contact support.");
         }
-
-        console.log(response); // Log response for debugging
+        console.log("Flutterwave Checkout Callback Response:", response); // Log response for debugging
+      },
+      onclose: function () {
+        // User closed the payment modal
+        console.log("Flutterwave payment modal closed by user.");
       },
     });
   });
+
+  // --- Email Matching Validation  ---
+  const emailMatchError = document.getElementById("emailMatchError");
+
+  // If you want to put these event listeners inside DOMContentLoaded for consistency
+  // (assuming email and confirmEmail inputs are also available)
+  const emailInputForValidation = document.getElementById("email");
+  const confirmEmailInput = document.getElementById("confirmEmail");
+
+  if (emailInputForValidation && confirmEmailInput && emailMatchError) {
+    function validateEmails() {
+      if (emailInputForValidation.value !== confirmEmailInput.value) {
+        emailMatchError.style.display = "block";
+        confirmEmailInput.setCustomValidity("Emails do not match"); // Set HTML5 custom validation error
+      } else {
+        emailMatchError.style.display = "none";
+        confirmEmailInput.setCustomValidity(""); // Clear the error if emails match
+      }
+    }
+
+    emailInputForValidation.addEventListener("keyup", validateEmails);
+    confirmEmailInput.addEventListener("keyup", validateEmails);
+    confirmEmailInput.addEventListener("change", validateEmails); // Good for paste events
+  } else {
+    console.warn(
+      "Email validation elements not found. Check IDs: email, confirmEmail, emailMatchError"
+    );
+  }
 });

@@ -15,7 +15,7 @@
   --accent-color-rgb: 236, 24, 57; /* For rgba usage in shadows */
 }
 
-/* Dark Mode Variables (if you decide to implement a dark mode toggle) */
+/* Dark Mode Variables */
 body.dark {
   --bg-color-primary: #151515;
   --bg-color-secondary: #222222;
@@ -29,7 +29,7 @@ body.dark {
 
 /* General Body and HTML Elements */
 html {
-  scroll-behavior: smooth; /* Ensures smooth scrolling for anchor links */
+  scroll-behavior: smooth; /*smooth scrolling for anchor links */
 }
 
 body {
@@ -85,9 +85,9 @@ p {
   ); /* Lighter background for navbar */
   padding: 1rem 0;
   box-shadow: var(--shadow-light);
-  position: sticky; /* Makes navbar stick to the top */
+  position: sticky; /*navbar stick to the top */
   top: 0;
-  z-index: 1000; /* Ensures navbar is above other content */
+  z-index: 1000;
   border-bottom: 1px solid var(--border-color); /* Subtle border */
 }
 
@@ -115,7 +115,7 @@ p {
   margin: 0;
   padding: 0;
   display: flex;
-  gap: 2rem; /* Space between nav items */
+  gap: 2rem;
 }
 
 .nav-link {
@@ -204,7 +204,7 @@ p {
 /* Hero Section */
 .hero {
   background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)),
-    url("../ASSETS/images/hero-bg.png") no-repeat center center/cover; /* Path adjusted for images */
+    url("../ASSETS/images/hero-bg.png") no-repeat center center/cover;
   color: white;
   text-align: center;
   padding: 8rem 1rem;
@@ -235,6 +235,10 @@ p {
   margin-left: auto;
   margin-right: auto;
   text-shadow: 1px 1px 4px rgba(0, 0, 0, 0.5);
+}
+
+.hero .container p {
+  color: var(--border-color);
 }
 
 .hero .cta-btn {
@@ -414,6 +418,26 @@ p {
   color: var(--text-color-dark);
   display: block;
   margin-top: 1rem;
+}
+
+.courses-section .container a {
+  background-color: var(--accent-color);
+  color: white;
+  padding: 1rem 2.5rem;
+  font-size: 1.2rem;
+  border-radius: 50px;
+  text-decoration: none;
+  display: inline-block;
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+  box-shadow: var(--shadow-medium);
+  font-weight: 600;
+}
+
+.courses-section .container a:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-5px) scale(1.02);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
 /* Registration Section */
@@ -818,5 +842,236 @@ button[type="submit"]:hover {
   }
   #countdownTimer {
     font-size: 1rem;
+  }
+}
+
+/* login */
+/* auth.css - Specific styles for Login and future Auth pages */
+
+/* Centralize login content */
+.login-body {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh; /* Full viewport height */
+  background-color: var(--bg-color-primary); /* Use your primary background */
+  padding: 20px; /* Padding for smaller screens */
+  box-sizing: border-box; /* Include padding in element's total width and height */
+}
+
+.login-container {
+  max-width: 450px; /* Max width for the login card */
+  width: 100%;
+}
+
+.login-card {
+  background-color: var(
+    --bg-color-secondary
+  ); /* Lighter background for the card */
+  padding: 40px;
+  border-radius: 15px;
+  box-shadow: var(--shadow-medium); /* Use your existing shadow variable */
+  text-align: center;
+  border: 1px solid var(--border-color); /* Subtle border */
+}
+
+.login-brand {
+  font-family: "Clicker Script", cursive;
+  font-size: 3.5rem; /* Larger brand name */
+  color: var(--accent-color);
+  margin-bottom: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+}
+
+.login-tagline {
+  font-size: 1.1rem;
+  color: var(--text-color-light);
+  margin-bottom: 30px;
+  line-height: 1.5;
+}
+
+/* Reusing your form-group styles */
+.login-form .form-group {
+  margin-bottom: 20px; /* Slightly more space for login form */
+}
+
+/* Reusing your input/select styles */
+.login-form input[type="email"],
+.login-form input[type="password"] {
+  width: calc(100% - 24px); /* Adjust padding for 12px on each side */
+  padding: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  color: var(--text-color-dark);
+  background-color: var(
+    --bg-color-primary
+  ); /* Input background matching main background */
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.login-form input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(var(--accent-color-rgb), 0.2);
+  outline: none;
+}
+
+.form-options {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  font-size: 0.95rem;
+}
+
+.remember-me {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-color-light);
+}
+
+.remember-me input[type="checkbox"] {
+  accent-color: var(--accent-color); /* Style checkbox with accent color */
+  cursor: pointer;
+}
+
+.forgot-password {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.forgot-password:hover {
+  color: var(--accent-color-hover);
+  text-decoration: underline;
+}
+
+/* General Button style based on your registration button */
+.btn-primary {
+  width: 100%;
+  padding: 15px 0;
+  background-color: var(--accent-color);
+  border: none;
+  border-radius: 10px;
+  color: white;
+  font-weight: 700;
+  font-size: 1.2rem;
+  cursor: pointer;
+  letter-spacing: 1.2px;
+  margin-top: 15px; /* Adjust margin from form-options */
+  transition: background-color 0.3s ease, transform 0.2s ease,
+    box-shadow 0.3s ease;
+  box-shadow: var(--shadow-medium);
+}
+
+.btn-primary:hover {
+  background-color: var(--accent-color-hover);
+  transform: translateY(-3px) scale(1.01);
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+}
+
+/* Social Login Buttons */
+.login-divider {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  margin: 30px 0;
+  color: var(--text-color-light);
+}
+
+.login-divider::before,
+.login-divider::after {
+  content: "";
+  flex: 1;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.login-divider:not(:empty)::before {
+  margin-right: 0.25em;
+}
+
+.login-divider:not(:empty)::after {
+  margin-left: 0.25em;
+}
+
+.btn-social {
+  width: 100%;
+  padding: 12px 0;
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  background-color: var(--bg-color-primary);
+  color: var(--text-color-dark);
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 15px;
+  transition: background-color 0.3s ease, border-color 0.3s ease,
+    box-shadow 0.3s ease;
+  box-shadow: var(--shadow-light);
+}
+
+.btn-social:hover {
+  background-color: var(--bg-color-tertiary);
+  border-color: var(--accent-color);
+  box-shadow: 0 5px 15px rgba(var(--accent-color-rgb), 0.1);
+}
+
+.btn-social i {
+  font-size: 1.3rem;
+}
+
+/* Signup Link */
+.signup-link {
+  margin-top: 25px;
+  font-size: 1rem;
+  color: var(--text-color-light);
+}
+
+.signup-link a {
+  color: var(--accent-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.3s ease;
+}
+
+.signup-link a:hover {
+  color: var(--accent-color-hover);
+  text-decoration: underline;
+}
+
+/* Responsive adjustments for Login page */
+@media (max-width: 480px) {
+  .login-card {
+    padding: 30px 20px;
+    margin: 0 10px; /* Ensure some margin on very small screens */
+  }
+
+  .login-brand {
+    font-size: 3rem;
+  }
+
+  .login-tagline {
+    font-size: 1rem;
+  }
+
+  .btn-primary,
+  .btn-social {
+    padding: 12px 0;
+    font-size: 1rem;
+  }
+
+  .form-options {
+    flex-direction: column;
+    gap: 15px;
+  }
+  .forgot-password {
+    text-align: center;
   }
 }
